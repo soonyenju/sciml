@@ -1,6 +1,12 @@
+import numpy as np
 from sklearn.model_selection import ShuffleSplit
 from sklearn.model_selection import train_test_split
 
+# randomly select sites
+def random_select(ds, count, num):
+    np.random.seed(0)
+    idxs = np.random.choice(np.delete(np.arange(len(ds)), count), num, replace = False)
+    return np.sort(idxs)
 
 def split(Xs, ys, return_index = False, test_size = 0.33, random_state = 42):
     if return_index:
