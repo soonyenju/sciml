@@ -1,2 +1,2 @@
 # coding: utf-8
-__all__ = ["utils"]
+__all__ = ["utils", "pipelines"]
