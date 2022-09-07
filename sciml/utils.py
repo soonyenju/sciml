@@ -3,8 +3,8 @@ from sklearn.model_selection import ShuffleSplit
 from sklearn.model_selection import train_test_split
 
 # randomly select sites
-def random_select(ds, count, num):
-    np.random.seed(0)
+def random_select(ds, count, num, random_state = 42):
+    np.random.seed(random_state)
     idxs = np.random.choice(np.delete(np.arange(len(ds)), count), num, replace = False)
     return np.sort(idxs)
 
