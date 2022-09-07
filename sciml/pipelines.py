@@ -12,7 +12,8 @@ def get_metrics(df, truth = 'truth', pred = 'pred'):
     mae = (df.dropna()[pred] - df.dropna()[truth]).abs().mean()
     return r2, slope, rmse, mbe, mae, intercept, p_value, std_err
 
-
+# ===============================================================================================================================
+# Machine learning algorithms
 def train_ml(
     X_train, y_train, model_name = 'XGB', 
     xgb_params_user = None, rfr_params_user = None, 
@@ -92,3 +93,27 @@ def train_ml(
         regr = CascadeForestRegressor(**df21_params)
     regr.fit(X_train, y_train)
     return regr
+
+# ===============================================================================================================================
+# Deep learning neural networks
+
+from tensorflow import keras
+from tensorflow.keras import layers
+from tensorflow.keras import models
+# from keras.layers import Dropout
+from keras.callbacks import EarlyStopping
+from scitbx.stutils import *
+
+def train_lstm(X_train, y_train, nfeature, ntime, verbose = 2, epochs = 200, batch_size = 64):
+    # create and fit the LSTM network
+    model = models.Sequential()
+    model.add(layers.LSTM(64, input_shape=(nfeature, ntime)))
+    model.add(layers.Dropout(0.2))
+    model.add(layers.Dense(16, activation='relu'))
+    model.add(layers.Dropout(0.2))
+    model.add(layers.Dense(1, activation='relu'))
+    model.compile(loss='mean_squared_error', optimizer='adam')
+    # es = EarlyStopping(monitor='loss', mode='min', verbose=1)
+    # model.fit(X_train.reshape(-1, nsites, nfeats), y_train, epochs=100, batch_size=256, verbose=2, callbacks=[es])
+    model.fit(X_train, y_train, epochs = epochs, batch_size = batch_size, verbose=verbose)
+    return model
