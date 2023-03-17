@@ -106,6 +106,12 @@ def train_ml(
     regr.fit(X_train, y_train)
     return regr
 
+def test_ml(X_test, y_test, regr):
+    res = y_test.copy() # y_test is 2D pandas dataframe.
+    res.columns = ['true']
+    res['pred'] = regr.predict(X_test)
+    return res
+
 # ===============================================================================================================================
 # Deep learning neural networks
 
