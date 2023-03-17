@@ -22,3 +22,25 @@ def split(Xs, ys, return_index = False, test_size = 0.33, random_state = 42):
             random_state = random_state
         )
         return (X_train, X_test, y_train, y_test)
+    
+def split_cut(Xs, ys, test_ratio = 0.33):
+    assert ys.ndim == 2, 'ys must be 2D!'
+    assert len(Xs) == len(ys), 'Xs and ys should be equally long!'
+    assert type(Xs) == type(ys), 'Xs and ys should be the same data type!'
+    if not type(Xs) in [pd.core.frame.DataFrame, np.ndarray]: raise Exception('Only accept numpy ndarray or pandas dataframe')
+    anchor = int(np.floor(len(ys) * (1 - test_ratio)))
+
+    if type(Xs) == pd.core.frame.DataFrame:
+        X_train = Xs.iloc[0: anchor, :]
+        X_test = Xs.iloc[anchor::, :]
+        y_train = ys.iloc[0: anchor, :]
+        y_test = ys.iloc[anchor::, :]
+    else:
+        X_train = Xs[0: anchor, :]
+        X_test = Xs[anchor::, :]
+        y_train = ys[0: anchor, :]
+        y_test = ys[anchor::, :]
+
+    assert len(X_train) + len(X_test) == len(Xs), 'The sum of train and test lengths must equal to Xs/ys!'
+
+    return (X_train, X_test, y_train, y_test)
