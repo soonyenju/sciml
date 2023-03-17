@@ -2,7 +2,7 @@ import numpy as np
 from scipy import stats
 from sklearn.metrics import mean_squared_error
 
-def get_metrics(df, truth = 'truth', pred = 'pred'):
+def get_metrics(df, truth = 'truth', pred = 'pred', return_dict = False):
     df = df[[truth, pred]].copy().dropna()
     slope, intercept, r_value, p_value, std_err = stats.linregress(df.dropna()[truth], df.dropna()[pred])
     r2 = r_value**2
@@ -10,7 +10,19 @@ def get_metrics(df, truth = 'truth', pred = 'pred'):
     rmse = np.sqrt(mse)
     mbe = np.mean(df.dropna()[pred] - df.dropna()[truth])
     mae = (df.dropna()[pred] - df.dropna()[truth]).abs().mean()
-    return r2, slope, rmse, mbe, mae, intercept, p_value, std_err
+    if return_dict:
+        return {
+            'R2': r2, 
+            'Slope': slope, 
+            'RMSE': rmse, 
+            'MBE': mbe, 
+            'MAE': mae, 
+            'Intercept': intercept, 
+            'p-value': p_value, 
+            'std_err': std_err
+        }
+    else:
+        return r2, slope, rmse, mbe, mae, intercept, p_value, std_err
 
 # ===============================================================================================================================
 # Machine learning algorithms
