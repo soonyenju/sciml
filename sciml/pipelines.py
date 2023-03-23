@@ -116,12 +116,15 @@ def test_ml(X_test, y_test, regr):
 # ===============================================================================================================================
 # Deep learning neural networks
 
-from tensorflow import keras
-from tensorflow.keras import layers
-from tensorflow.keras import models
-# from keras.layers import Dropout
-from keras.callbacks import EarlyStopping
-from scitbx.stutils import *
+try:
+    from tensorflow import keras
+    from tensorflow.keras import layers
+    from tensorflow.keras import models
+    # from keras.layers import Dropout
+    from keras.callbacks import EarlyStopping
+    from scitbx.stutils import *
+except Exception as e:
+    print(e)
 
 def train_lstm(X_train, y_train, nfeature, ntime, verbose = 2, epochs = 200, batch_size = 64):
     # create and fit the LSTM network
