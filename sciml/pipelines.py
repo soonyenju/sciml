@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from scipy import stats
 from sklearn.metrics import mean_squared_error
 
@@ -11,7 +12,7 @@ def get_metrics(df, truth = 'truth', pred = 'pred', return_dict = False):
     mbe = np.mean(df.dropna()[pred] - df.dropna()[truth])
     mae = (df.dropna()[pred] - df.dropna()[truth]).abs().mean()
     if return_dict:
-        return {
+        return pd.DataFrame.from_dict([{
             'R2': r2, 
             'Slope': slope, 
             'RMSE': rmse, 
@@ -20,7 +21,7 @@ def get_metrics(df, truth = 'truth', pred = 'pred', return_dict = False):
             'Intercept': intercept, 
             'p-value': p_value, 
             'std_err': std_err
-        }
+        }])
     else:
         return r2, slope, rmse, mbe, mae, intercept, p_value, std_err
 
