@@ -108,7 +108,7 @@ def train_ml(
 
 def test_ml(X_test, y_test, regr):
     res = y_test.copy() # y_test is 2D pandas dataframe.
-    res.columns = ['true']
+    res.columns = ['truth']
     res['pred'] = regr.predict(X_test)
     return res
 
