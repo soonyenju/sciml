@@ -4,6 +4,9 @@ from scipy import stats
 from sklearn.metrics import mean_squared_error
 
 def get_metrics(df, truth = 'truth', pred = 'pred', return_dict = False):
+    '''
+    Calculate statistical measures between validation and prediction sequences
+    '''
     df = df[[truth, pred]].copy().dropna()
     slope, intercept, r_value, p_value, std_err = stats.linregress(df.dropna()[truth], df.dropna()[pred])
     r2 = r_value**2
