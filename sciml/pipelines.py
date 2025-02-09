@@ -1,7 +1,10 @@
 import numpy as np
 import pandas as pd
 from scipy import stats
+from copy import deepcopy
+from tqdm import tqdm
 from sklearn.metrics import mean_squared_error
+from xgboost import XGBRegressor
 
 def get_metrics(df, truth = 'truth', pred = 'pred', return_dict = False):
     '''
@@ -16,7 +19,7 @@ def get_metrics(df, truth = 'truth', pred = 'pred', return_dict = False):
     mae = (df.dropna()[pred] - df.dropna()[truth]).abs().mean()
     if return_dict:
         return pd.DataFrame.from_dict([{
-            'R2': r2, 
+            'r2': r2, 
             'Slope': slope, 
             'RMSE': rmse, 
             'MBE': mbe, 
@@ -115,6 +118,33 @@ def test_ml(X_test, y_test, regr):
     res.columns = ['truth']
     res['pred'] = regr.predict(X_test)
     return res
+
+def run_ensemble(X_train, y_train, n_models = 10, frac_sample = 0.8):
+    base_params_xgb = {
+        "objective": "reg:squarederror",
+        'seed': 0,
+        "random_state": 0,
+    }
+    params_xgb = deepcopy(base_params_xgb)
+    # dropout-like regularization
+    params_xgb.update({
+        "subsample": 0.8,  # Use 80% of the data for each tree
+        "colsample_bytree": 0.8,  # Use 80% of the features for each tree
+    })
+
+    models = []
+    for i in tqdm(range(n_models)):
+        # Create a bootstrapped dataset
+        y_resampled = y_train.copy().sample(frac = frac_sample, random_state = i)
+        X_resampled = X_train.copy().loc[y_resampled.index]
+        # print(y_resampled.sort_index().index[0], y_resampled.sort_index().index[-1])
+
+        # Train the XGBoost model
+        params_xgb.update({'random_state': i})
+        model = XGBRegressor(**params_xgb)
+        model.fit(X_resampled, y_resampled)
+        models.append(model)
+    return models
 
 # ===============================================================================================================================
 # Deep learning neural networks
