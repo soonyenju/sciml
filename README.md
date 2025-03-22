@@ -1,2 +1,2 @@
-# sciml
+# SCIentific Machine Learning (sciml)
  
