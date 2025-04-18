@@ -142,6 +142,9 @@ class SmartForest:
                     params['tree_method'] = 'hist'
                     params['device'] = 'cuda'
 
+                params = params.copy()  # Prevent modification from affecting the next loop iteration
+                params['random_state'] = i  # Use a different random seed for each model to enhance diversity
+
                 model = XGBRegressor(**params)
                 model.fit(X, y)
 
@@ -221,10 +224,15 @@ class SmartForest:
 """
 # ============================== Test Example ==============================
 from sklearn.datasets import load_diabetes
+from sklearn.datasets import fetch_california_housing
+from sklearn.model_selection import train_test_split
+
+
 
 warnings.simplefilter('ignore')
 
-X, y = load_diabetes(return_X_y=True)
+# X, y = load_diabetes(return_X_y=True) # Using diabetes dataset
+X, y = fetch_california_housing(return_X_y=True) # Using house price dataset
 X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, random_state=42)
 
 # Hyperparameter grid
@@ -244,7 +252,7 @@ param_grid = {
 }
 
 # Create the model with Multi-Grained Scanning enabled (with window sizes 2 and 3)
-df_reg = SmartForest(
+regr = SmartForest(
     n_estimators_per_layer = 5,
     max_layers = 10,
     early_stopping_rounds = 5,
@@ -256,14 +264,14 @@ df_reg = SmartForest(
     verbose = 1
 )
 
-df_reg.fit(X_train, y_train, X_val, y_val)
+regr.fit(X_train, y_train, X_val, y_val)
 
 # Predict on validation set and evaluate
-y_pred = df_reg.predict(X_val)
+y_pred = regr.predict(X_val)
 rmse = np.sqrt(mean_squared_error(y_val, y_pred))
 print("\nFinal RMSE:", rmse)
 
 # Output best model and RMSE
-best_model, best_rmse = df_reg.get_best_model()
+best_model, best_rmse = regr.get_best_model()
 print("\nBest validation RMSE:", best_rmse)
 """
