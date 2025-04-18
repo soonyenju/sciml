@@ -13,7 +13,7 @@ from setuptools import setup, find_packages
 
 setup(
 	name = "sciml",
-	version = "0.0.8",
+	version = "0.0.9",
 	keywords = ("Scientific machine learning wrappers"),
 	description = "draw and basic calculations/conversions",
 	long_description = "coming soon",
