@@ -223,13 +223,12 @@ class SmartForest:
 
 """
 # ============================== Test Example ==============================
+import warnings
+import numpy as np
 from sklearn.datasets import load_diabetes
 from sklearn.datasets import fetch_california_housing
 from sklearn.model_selection import train_test_split
-
-
-
-warnings.simplefilter('ignore')
+from sklearn.metrics import mean_squared_error
 
 # X, y = load_diabetes(return_X_y=True) # Using diabetes dataset
 X, y = fetch_california_housing(return_X_y=True) # Using house price dataset
