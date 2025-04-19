@@ -155,7 +155,7 @@ try:
     from tensorflow.keras import models
     # from keras.layers import Dropout
     from keras.callbacks import EarlyStopping
-    from scitbx.stutils import *
+    from scitbx.utils import *
 except Exception as e:
     print(e)
 
