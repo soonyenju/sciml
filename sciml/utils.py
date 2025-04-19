@@ -24,6 +24,9 @@ def split(Xs, ys, return_index = False, test_size = 0.33, random_state = 42):
         return (X_train, X_test, y_train, y_test)
     
 def split_cut(Xs, ys, test_ratio = 0.33):
+    """
+    Split the timeseries into before and after halves
+    """
     assert ys.ndim == 2, 'ys must be 2D!'
     assert len(Xs) == len(ys), 'Xs and ys should be equally long!'
     assert type(Xs) == type(ys), 'Xs and ys should be the same data type!'
