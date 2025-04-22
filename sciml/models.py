@@ -647,3 +647,150 @@ print("\n✅ Final RMSE on validation set:", rmse)
 best_model, best_rmse = model.get_best_model()
 print("\nBest validation RMSE:", best_rmse)
 """
+
+# ============================================================================================================================================================
+# Function mode
+
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+from tensorflow.keras.models import load_model
+
+def srcnn(learning_rate=0.001):
+    """
+    Builds and compiles a Super-Resolution Convolutional Neural Network (SRCNN) model 
+    that fuses features from both low-resolution and high-resolution images.
+
+    This model uses two parallel input streams:
+    - A low-resolution input which undergoes upscaling through convolutional layers.
+    - A high-resolution input from which texture features are extracted and fused with the low-resolution stream.
+
+    Args:
+        save_path (str, optional): Path to save the compiled model. If None, the model is not saved.
+        learning_rate (float): Learning rate for the Adam optimizer.
+
+    Returns:
+        keras.Model: A compiled Keras model ready for training.
+    """
+    # Input layers
+    lowres_input = layers.Input(shape=(None, None, 1))  # Low-resolution input
+    highres_input = layers.Input(shape=(None, None, 1))  # High-resolution image
+
+    # Feature extraction from high-resolution image
+    highres_features = layers.Conv2D(64, (3, 3), activation="relu", padding="same")(highres_input)
+    highres_features = layers.Conv2D(128, (3, 3), activation="relu", padding="same")(highres_features)
+
+    # Processing low-resoltuion input
+    x = layers.Conv2D(64, (3, 3), activation="relu", padding="same")(lowres_input)
+    x = layers.Conv2D(128, (3, 3), activation="relu", padding="same")(x)
+
+    # Fusion of high-resolution image textures
+    fusion = layers.Concatenate()([x, highres_features])
+    fusion = layers.Conv2D(128, (3, 3), activation="relu", padding="same")(fusion)
+    fusion = layers.Conv2D(64, (3, 3), activation="relu", padding="same")(fusion)
+
+    # Output
+    output = layers.Conv2D(1, (3, 3), activation="sigmoid", padding="same")(fusion)
+
+    model = keras.Model(inputs=[lowres_input, highres_input], outputs=output)
+    model.compile(optimizer=keras.optimizers.Adam(learning_rate=learning_rate), loss="mse")
+
+    return model
+
+def print_model(model):
+    return model.summary()
+
+def train(lowres_data, highres_data, epochs=100, batch_size=1, verbose=1, save_path=None):
+    model = srcnn()
+    # Train SRCNN
+    model.fit([modis_data_1, s2_data], s2_data, epochs=epochs, batch_size=batch_size, verbose=verbose)
+    # Save the complete model
+    # Recommended in newer versions of Keras (TensorFlow 2.11+): e.g., 'texture_fusion_model.keras'
+    if save_path: model.save(save_path)
+
+def apply(model, lowres_data_app, highres_data):
+    super_resolved = model.predict([lowres_data_app, highres_data]).squeeze() 
+    super_resolved = xr.DataArray(
+        super_resolved, 
+        dims = ("latitude", "longitude"), 
+        coords={"latitude": highres_data.latitude, "longitude": highres_data.longitude}, 
+        name="super_res"
+    )
+    return super_resolved
+
+def load_model(save_path):
+    model = load_model('texture_fusion_model.keras') 
+
+# ------------------------------------------------------------------------------------------------------------------------------------------------------------
+# Class mode
+
+import numpy as np
+import xarray as xr
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+from tensorflow.keras.callbacks import EarlyStopping
+
+class TextureFusionSRCNN:
+    def __init__(self, learning_rate=0.001):
+        self.learning_rate = learning_rate
+        self.model = self._build_model()
+
+    def _build_model(self):
+        # Input layers
+        lowres_input = layers.Input(shape=(None, None, 1))  # Low-resolution input
+        highres_input = layers.Input(shape=(None, None, 1))  # High-resolution image
+
+        # Feature extraction from high-resolution image
+        highres_features = layers.Conv2D(64, (3, 3), activation="relu", padding="same")(highres_input)
+        highres_features = layers.Conv2D(128, (3, 3), activation="relu", padding="same")(highres_features)
+
+        # Processing low-resolution input
+        x = layers.Conv2D(64, (3, 3), activation="relu", padding="same")(lowres_input)
+        x = layers.Conv2D(128, (3, 3), activation="relu", padding="same")(x)
+
+        # Fusion of high-resolution image textures
+        fusion = layers.Concatenate()([x, highres_features])
+        fusion = layers.Conv2D(128, (3, 3), activation="relu", padding="same")(fusion)
+        fusion = layers.Conv2D(64, (3, 3), activation="relu", padding="same")(fusion)
+
+        # Output
+        output = layers.Conv2D(1, (3, 3), activation="sigmoid", padding="same")(fusion)
+
+        model = keras.Model(inputs=[lowres_input, highres_input], outputs=output)
+        model.compile(optimizer=keras.optimizers.Adam(learning_rate=self.learning_rate), loss="mse")
+
+        return model
+
+    def summary(self):
+        return self.model.summary()
+
+    def train(self, lowres_data, highres_data, epochs=100, batch_size=1, verbose=1, save_path=None):
+        early_stop = EarlyStopping(
+            monitor='loss',       # You can change to 'val_loss' if you add validation
+            patience=10,          # Number of epochs with no improvement after which training will be stopped
+            restore_best_weights=True
+        )
+
+        self.model.fit(
+            [lowres_data, highres_data], highres_data,
+            epochs=epochs,
+            batch_size=batch_size,
+            verbose=verbose,
+            callbacks=[early_stop]
+        )
+
+        if save_path:
+            self.model.save(save_path)
+
+    def apply(self, lowres_data_app, highres_data):
+        super_resolved = self.model.predict([lowres_data_app, highres_data]).squeeze()
+        return super_resolved
+
+    @staticmethod
+    def load(save_path):
+        model = keras.models.load_model(save_path)
+        instance = TextureFusionSRCNN()
+        instance.model = model
+        return instance
+
