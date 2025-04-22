@@ -492,7 +492,7 @@ class SmartForest4D:
                     for f in range(X.shape[3]):
                         spatial_2d = X[sample, t, :, f].reshape(self.spatial_h, self.spatial_w)
                         # Apply 2D convolution
-                        filtered = convolve(spatial_2d, self.kernel, mode='constant', cval=0.0)
+                        filtered = ndimage.convolve(spatial_2d, self.kernel, mode='constant', cval=0.0)
                         # Flatten back to (20,) and store
                         X_out[sample, t, :, f] = filtered.reshape(n_spatial)
             X = X_out; del(X_out)
