@@ -703,7 +703,7 @@ def print_model(model):
 def train(lowres_data, highres_data, epochs=100, batch_size=1, verbose=1, save_path=None):
     model = srcnn()
     # Train SRCNN
-    model.fit([modis_data_1, s2_data], s2_data, epochs=epochs, batch_size=batch_size, verbose=verbose)
+    model.fit([lowres_data, highres_data], highres_data, epochs=epochs, batch_size=batch_size, verbose=verbose)
     # Save the complete model
     # Recommended in newer versions of Keras (TensorFlow 2.11+): e.g., 'texture_fusion_model.keras'
     if save_path: model.save(save_path)
