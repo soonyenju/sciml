@@ -1,7 +1,6 @@
 import numpy as np
 import copy
 import itertools
-import warnings
 from xgboost import XGBRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
@@ -223,7 +222,6 @@ class SmartForest:
 
 """
 # ============================== Test Example ==============================
-import warnings
 import numpy as np
 from sklearn.datasets import load_diabetes
 from sklearn.datasets import fetch_california_housing
