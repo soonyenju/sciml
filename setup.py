@@ -13,9 +13,9 @@ from setuptools import setup, find_packages
 
 setup(
 	name = "sciml",
-	version = "0.0.11",
-	keywords = ("Scientific machine learning wrappers"),
-	description = "draw and basic calculations/conversions",
+	version = "0.0.12",
+	keywords = ("Geospatial scientific ML"),
+	description = "Machine/deep learning models and toolboxes for geosciences.",
 	long_description = "coming soon",
 	license = "MIT Licence",
 
