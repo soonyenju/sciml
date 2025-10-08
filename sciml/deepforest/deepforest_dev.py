@@ -325,7 +325,7 @@ clf_model = DeepForestClassifier(
     max_layers=5,
     n_splits=3,
     verbose=1,
-    use_gpu=True # 如果你有 NVIDIA GPU，请改为 True 测试加速
+    use_gpu=False # 如果你有 NVIDIA GPU，请改为 True 测试加速
 )
 
 clf_start_time = time()
@@ -353,7 +353,7 @@ reg_model = DeepForestRegressor(
     max_layers=5,
     n_splits=3,
     verbose=1,
-    use_gpu=True
+    use_gpu=False
 )
 
 reg_start_time = time()
