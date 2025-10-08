@@ -8,5 +8,5 @@ Website: https://sites.google.com/view/uflux
 
 ## Dev log
 08/10/2025: 
- - add deepforest
+ - add deepforest (pure Python, support GPU)
  - next: merge deepforest and smartforest4d
